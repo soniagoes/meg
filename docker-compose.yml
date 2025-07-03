@@ -1,0 +1,34 @@
+services:
+# criei esse docker-compose baseado no dockerfile
+  api:
+    # Constrói a imagem Docker a partir do Dockerfile no diretório atual
+    # Constrói a imagem a partir do Dockerfile no diretório atual (.),
+    # seguindo as instruções definidas nele (imagem base, dependências, etc.).
+    build: .
+    # Mapeamento de portas: porta_host:porta_container
+    # Define um nome descritivo para o contêiner para facilitar o gerenciamento.
+    container_name: api
+    # Mapeia a porta 8000 do seu computador (host) para a porta 8000 do contêiner,
+    # que é a porta que o Dockerfile expõe (EXPOSE 8000) e onde o Uvicorn executa.
+    ports:
+      - "8000:8000"
+    # Mapeamento de volumes: caminho_host:caminho_container
+    # Monta o diretório do projeto atual no container em /app.
+    # Útil para desenvolvimento, pois as alterações de código no host são refletidas no container.
+    # Monta o diretório atual do projeto ('.') no diretório '/app' dentro do contêiner.
+    # O '/app' corresponde ao `WORKDIR /app` do Dockerfile. Este mapeamento é crucial
+    # para o desenvolvimento, pois:
+    # 1. Persiste o banco de dados 'escola.db' na sua máquina local.
+    # 2. Permite que o 'hot-reload' do Uvicorn funcione, pois as alterações no código
+    #    são refletidas instantaneamente dentro do contêiner.
+    volumes:
+      - .:/app
+    # Sobrescreve o comando padrão do Dockerfile para habilitar o --reload,
+    # que reinicia o servidor automaticamente ao detectar alterações no código.
+    # Sobrescreve o comando `CMD` padrão do Dockerfile.
+    # A flag `--reload` é adicionada para que o servidor Uvicorn reinicie
+    # automaticamente sempre que um arquivo Python for alterado, agilizando o
+    # ciclo de desenvolvimento.
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+    # comando para rodar: docker compose up
